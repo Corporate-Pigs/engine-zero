@@ -9,3 +9,6 @@
 [submodule "vendor/json"]
 	path = vendor/json
 	url = https://github.com/nlohmann/json.git
+[submodule "vendor/cppvec"]
+	path = vendor/cppvec
+	url = git@github.com:nflsilva/cppvec.git

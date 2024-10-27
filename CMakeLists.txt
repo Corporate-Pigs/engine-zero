@@ -13,10 +13,11 @@ file(GLOB_RECURSE ENGINE_SOURCES "source/*.cpp")
 # Add the Engine library target
 add_library(engine-zero STATIC ${ENGINE_SOURCES})
 
-# Add smt
+# Add dependencies
 add_subdirectory(vendor/SDL2)
 add_subdirectory(vendor/SDL2_image)
 add_subdirectory(vendor/json)
+add_subdirectory(vendor/cppvec)
 
 # Specify include directories for the Engine library
 target_include_directories(engine-zero PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
