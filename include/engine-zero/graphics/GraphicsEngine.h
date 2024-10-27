@@ -23,7 +23,7 @@ class GraphicsEngine {
     GraphicsEngine(const Options* options);
     virtual ~GraphicsEngine() = default;
 
-    virtual Sprite* createSprite(const std::string path, const Rectangle& subSpriteRectangle) = 0;
+    virtual Sprite* createSprite(const std::string path, const Rectangle& subSpriteRectangle = {0, 0, 0, 0}) = 0;
     virtual void render(Renderable* sprite, const Transform* transform) = 0;
 
     void centerCameraOn(float x, float y);

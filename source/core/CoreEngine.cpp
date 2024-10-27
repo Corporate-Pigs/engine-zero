@@ -14,12 +14,6 @@ Engine::CoreEngine* Engine::CoreEngine::buildDefault(std::shared_ptr<Engine::Gam
                                                      Engine::Options* options) {
     // TODO: we need a factory here!
     auto ui = std::shared_ptr<UserInterface>(new Engine::SDLUserInterface(options));
-    auto im = ui->getInputManager();
-    im->setActionMapping("up", Engine::InputKey::K_w);
-    im->setActionMapping("down", Engine::InputKey::K_s);
-    im->setActionMapping("left", Engine::InputKey::K_a);
-    im->setActionMapping("right", Engine::InputKey::K_d);
-
     return new Engine::CoreEngine(ui, game, *options);
 }
 

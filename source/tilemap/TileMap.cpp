@@ -7,18 +7,19 @@ static constexpr unsigned FLIPPED_VERTICALLY_FLAG = 0x40000000;
 static constexpr unsigned FLIPPED_DIAGONALLY_FLAG = 0x20000000;
 static constexpr unsigned ROTATED_HEXAGONAL_120_FLAG = 0x10000000;
 
-Engine::TileMap::TileMap(const Transform& transform, uint16_t nVisibleColumns, uint16_t nVisibleRows)
-    : Actor(0, transform), nVisibleColumns(nVisibleColumns), nVisibleRows(nVisibleRows) {}
+Engine::TileMap::TileMap(const Transform& transform, const std::string& filePath, uint16_t nVisibleColumns, uint16_t nVisibleRows) : 
+    Actor(0, transform), 
+    nVisibleColumns(nVisibleColumns), 
+    nVisibleRows(nVisibleRows), 
+    tiledTileMap(new Engine::TiledTileMap())
+{
 
-void Engine::TileMap::buildFromTiledJson(const std::string& filePath, TileMap& tileMap, Context* context) {
     // load tile map from json file
-    TiledTileMap tiledTileMap;
-    TiledTileMap::fromJson(filePath, tiledTileMap);
+    TiledTileMap::fromJson(filePath, *tiledTileMap);
 
     // load tile sheets from json
     TiledTileSheet tiledTileSheet;
-    std::map<std::string, TiledTileSheet> tiledTileSheets;
-    for (const auto& tiledTileSet : tiledTileMap.tileSets) {
+    for (const auto& tiledTileSet : tiledTileMap->tileSets) {
         if (tiledTileSheets.contains(tiledTileSet.source)) {
             continue;
         }
@@ -27,16 +28,18 @@ void Engine::TileMap::buildFromTiledJson(const std::string& filePath, TileMap& t
     }
 
     // setup dims
-    tileMap.mNumberOfColumns = tiledTileMap.width;
-    tileMap.mNumberOfRows = tiledTileMap.height;
-    tileMap.mTileHeight = tileMap.transform.mHeight / tileMap.nVisibleRows;
-    tileMap.mTileWidth = tileMap.transform.mWidth / tileMap.nVisibleColumns;
+    mNumberOfColumns = tiledTileMap->width;
+    mNumberOfRows = tiledTileMap->height;
+    mTileHeight = transform.mHeight / nVisibleRows;
+    mTileWidth = transform.mWidth / nVisibleColumns;
+}
 
+void Engine::TileMap::onStart(Context* context) {
     // create tile map layers
-    for (uint16_t layerIndex = 0; layerIndex < tiledTileMap.layers.size(); layerIndex++) {
-        TiledTileMapLayer& layer = tiledTileMap.layers[layerIndex];
-        tileMap.mTileLayers.push_back(TileLayer());
-        tileMap.mTileLayers[layerIndex].tiles.reset(new Tile[tiledTileMap.width * tiledTileMap.height]);
+    for (uint16_t layerIndex = 0; layerIndex < tiledTileMap->layers.size(); layerIndex++) {
+        TiledTileMapLayer& layer = tiledTileMap->layers[layerIndex];
+        mTileLayers.push_back(TileLayer());
+        mTileLayers[layerIndex].tiles.reset(new Tile[tiledTileMap->width * tiledTileMap->height]);
 
         for (uint16_t tileIndex = 0; tileIndex < layer.data.size(); tileIndex++) {
             uint32_t globalTileId = layer.data[tileIndex];
@@ -44,16 +47,16 @@ void Engine::TileMap::buildFromTiledJson(const std::string& filePath, TileMap& t
                               ROTATED_HEXAGONAL_120_FLAG);
             if (globalTileId == 0) continue;
 
-            auto& tile = tileMap.mTileLayers[layerIndex].tiles[tileIndex];
+            auto& tile = mTileLayers[layerIndex].tiles[tileIndex];
 
             // compute drawing position
-            uint32_t tileRow = tileIndex / tiledTileMap.width;
-            uint32_t tileColumn = tileIndex % tiledTileMap.width;
-            tile.transform = {tileColumn * tileMap.mTileWidth, tileRow * tileMap.mTileHeight, tileMap.mTileWidth,
-                              tileMap.mTileHeight, tileMap.transform.mLayer};
+            uint32_t tileRow = tileIndex / tiledTileMap->width;
+            uint32_t tileColumn = tileIndex % tiledTileMap->width;
+            tile.transform = {tileColumn * mTileWidth, tileRow * mTileHeight, mTileWidth, mTileHeight,
+                              transform.mLayer};
 
             // find sheet
-            auto tileSetPtr = tiledTileMap.getTileSetPtrForTileId(globalTileId);
+            auto tileSetPtr = tiledTileMap->getTileSetPtrForTileId(globalTileId);
             auto& tileSheet = tiledTileSheets[tileSetPtr->source];
 
             // setup properties
@@ -82,6 +85,9 @@ void Engine::TileMap::buildFromTiledJson(const std::string& filePath, TileMap& t
             }
         }
     }
+
+    tiledTileMap.release();
+    tiledTileSheets.clear();
 }
 
 void Engine::TileMap::onRender(Context* context) {
@@ -98,3 +104,11 @@ void Engine::TileMap::onRender(Context* context) {
         }
     }
 }
+
+uint32_t Engine::TileMap::getTileHeight() { 
+    return mTileHeight; 
+};
+
+uint32_t Engine::TileMap::getTileWidth() { 
+    return mTileWidth; 
+};

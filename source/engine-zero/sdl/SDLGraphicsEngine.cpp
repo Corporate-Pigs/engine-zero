@@ -23,7 +23,17 @@ Engine::Sprite* Engine::SDLGraphicsEngine::createSprite(const std::string path, 
             mTextureCache[path] = texture;
         }
 
-        auto sprite = new SDLSprite(mTextureCache[path], mRenderer, subSpriteRectangle);
+        auto texture = mTextureCache[path];
+
+        Rectangle auxiliarRectangle = subSpriteRectangle;
+        if(subSpriteRectangle.isDefault()) {
+            int32_t w, h;
+            SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+            auxiliarRectangle.mHeight = static_cast<float>(h);
+            auxiliarRectangle.mWidth = static_cast<float>(w);
+        }
+
+        auto sprite = new SDLSprite(texture, mRenderer, auxiliarRectangle);
         mSpriteCache[spriteUuid].reset(sprite);
         return sprite;
     }
