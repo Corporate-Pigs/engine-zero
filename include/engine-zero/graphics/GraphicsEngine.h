@@ -27,6 +27,7 @@ class GraphicsEngine {
     virtual void render(Renderable* sprite, const Transform* transform) = 0;
 
     void centerCameraOn(float x, float y);
+    void centerCameraOn(float x);
 
     // clear current engine context
     // (rendering units, caches...)

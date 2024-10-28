@@ -25,10 +25,10 @@ class Actor {
     virtual void onDestroy(Context* context);
 
     Actor* setActive(bool active);
+    Transform transform;
 
    protected:
     uint32_t uid;
-    Transform transform;
     bool mActive = true;
 };
 

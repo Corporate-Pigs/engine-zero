@@ -36,6 +36,10 @@ void Engine::GraphicsEngine::centerCameraOn(float x, float y) {
     mCamera.moveTo(x - mCamera.rectangle.mWidth * 0.5f, y - mCamera.rectangle.mHeight * 0.5f);
 }
 
+void Engine::GraphicsEngine::centerCameraOn(float x) {
+    mCamera.moveTo(x - mCamera.rectangle.mWidth * 0.5f, mCamera.rectangle.mY);
+}
+
 void Engine::GraphicsEngine::flush() {
     for (int i = 0; i < GRAPHICS_ENGINE_RENDERING_LAYERS; i++) {
         auto layerPtr = &mRenderingLayers[i];

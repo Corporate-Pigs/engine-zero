@@ -10,13 +10,15 @@ class RigidBody {
    public:
     RigidBody(Transform* transform, bool movable = true);
     uint32_t uid;
-    void setSpeed(float xSpeed, float ySpeed);
+    void moveHorizontal(const float speed);
+    void moveVertical(const float speed);
     void stop();
     bool isIntersecting(const RigidBody& other) const;
     bool isMovable() const;
     void applyGravity(const float magnitude);
     void update(const double elapsedTime);
     Transform* transform;
+    bool isOnGround = false;
 
    private:
     bool isStatic = false;
