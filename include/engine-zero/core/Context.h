@@ -2,6 +2,7 @@
 
 #include "engine-zero/graphics/GraphicsEngine.h"
 #include "engine-zero/ui/UserInterface.h"
+#include "engine-zero/physics/PhysicsEngine.h"
 
 namespace Engine {
 
@@ -9,9 +10,9 @@ namespace Engine {
  * Represents the current runtime context of the engine.
  */
 struct Context {
-    Context(GraphicsEngine* graphics, UserInterface* ui);
     GraphicsEngine* graphics;
     UserInterface* ui;
+    PhysicsEngine* physics;
     double elapsedTime;
 };
 

@@ -8,7 +8,9 @@
 #include "engine-zero/resource/Tiled.h"
 
 Engine::CoreEngine::CoreEngine(std::shared_ptr<UserInterface> ui, std::shared_ptr<Game> game, Options options)
-    : mGraphics(nullptr), mUI(ui), mGame(game), mOptions(options) {}
+    : mGraphics(nullptr), mUI(ui), mGame(game), mOptions(options), mPhysics(new PhysicsEngine()) {
+
+}
 
 Engine::CoreEngine* Engine::CoreEngine::buildDefault(std::shared_ptr<Engine::Game> game,
                                                      Engine::Options* options) {
@@ -18,15 +20,15 @@ Engine::CoreEngine* Engine::CoreEngine::buildDefault(std::shared_ptr<Engine::Gam
 }
 
 void Engine::CoreEngine::start() {
+
     mUI->start();
-    
+
     mGraphics.reset(mUI->enableGraphics());
     mGraphics->start();
 
-    Context context(mGraphics.get(), mUI.get());
+    Context context = {mGraphics.get(), mUI.get(), mPhysics.get()};
 
     mGame->start(&context);
-
     double previous = mUI->getTime();
 
     while (mUI->isRunning()) {
@@ -36,6 +38,9 @@ void Engine::CoreEngine::start() {
 
         // update window and handle input events
         mUI->update();
+
+        // update physics
+        mPhysics->update(context.elapsedTime);
 
         // update game state
         mGame->update(&context);

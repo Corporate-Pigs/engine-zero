@@ -26,4 +26,4 @@ target_include_directories(engine-zero PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/includ
 target_include_directories(engine-zero PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/source)
 
 # Link SMT libraries to Engine
-target_link_libraries(engine-zero PUBLIC SDL2::SDL2 SDL2_image nlohmann_json)
+target_link_libraries(engine-zero PUBLIC SDL2::SDL2 SDL2_image nlohmann_json cppvec)

@@ -12,14 +12,24 @@ struct TiledTileSheetTileAnimationFrame {
     double duration;
 };
 
+struct TiledTileSheetTileObject {
+    uint32_t id, x, y, height, width;
+    std::string type;
+};
+
 struct TiledTileSheetTileProperty {
     std::string name;
     std::variant<bool, std::string> value;
 };
 
+struct TiledTileSheetTileObjectGroup {
+    std::vector<TiledTileSheetTileObject> objects;
+};
+
 struct TiledTileSheetTile {
     std::string type;
     uint32_t id;
+    TiledTileSheetTileObjectGroup objectGroup;
     std::vector<TiledTileSheetTileProperty> properties;
     std::vector<TiledTileSheetTileAnimationFrame> keyframes;
 };
@@ -72,5 +82,9 @@ void from_json(const nlohmann::json& j, TiledTileMapLayer& p);
 void from_json(const nlohmann::json& j, TiledTileMapTileSet& p);
 
 void from_json(const nlohmann::json& j, TiledTileMap& p);
+
+void from_json(const nlohmann::json& j, TiledTileSheetTileObjectGroup& p);
+
+void from_json(const nlohmann::json& j, TiledTileSheetTileObject& p);
 
 }  // namespace Engine

@@ -3,6 +3,7 @@
 #include "engine-zero/core/EngineOptions.h"
 #include "engine-zero/core/Game.h"
 #include "engine-zero/graphics/GraphicsEngine.h"
+#include "engine-zero/physics/PhysicsEngine.h"
 #include "engine-zero/ui/UserInterface.h"
 
 #define CORE_ENGINE_UPDATE_STEP 0.01f
@@ -18,6 +19,7 @@ class CoreEngine {
     std::shared_ptr<Game> mGame;
     std::shared_ptr<GraphicsEngine> mGraphics;
     std::shared_ptr<UserInterface> mUI;
+    std::shared_ptr<PhysicsEngine> mPhysics;
 
    public:
     CoreEngine(std::shared_ptr<UserInterface> ui, std::shared_ptr<Game> game, Options options);

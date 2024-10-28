@@ -35,6 +35,7 @@ Engine::TileMap::TileMap(const Transform& transform, const std::string& filePath
 }
 
 void Engine::TileMap::onStart(Context* context) {
+    
     // create tile map layers
     for (uint16_t layerIndex = 0; layerIndex < tiledTileMap->layers.size(); layerIndex++) {
         TiledTileMapLayer& layer = tiledTileMap->layers[layerIndex];
@@ -83,6 +84,14 @@ void Engine::TileMap::onStart(Context* context) {
                 tileSheet.computeRectangleForTileId(sheetTileId, spriteRectangle);
                 tile.sprite = context->graphics->createSprite(tileSheet.image, spriteRectangle);
             }
+
+            // setup rigid bodies
+            for(const auto& object : sheetTile.objectGroup.objects) {
+                if(object.type == "collidable") {
+                    tile.rigidBody = context->physics->createRigidBody(&tile.transform, false);
+                }
+            }
+
         }
     }
 

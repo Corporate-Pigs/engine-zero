@@ -3,6 +3,19 @@
 #include "engine-zero/resource/ResourceLoader.h"
 #include "engine-zero/resource/ResourceManager.h"
 
+void Engine::from_json(const nlohmann::json& j, TiledTileSheetTileObjectGroup& p) {
+    j.at("objects").get_to(p.objects);
+}
+
+void Engine::from_json(const nlohmann::json& j, TiledTileSheetTileObject& p) {
+    j.at("id").get_to(p.id);
+    j.at("x").get_to(p.x);
+    j.at("y").get_to(p.y);
+    j.at("height").get_to(p.height);
+    j.at("width").get_to(p.width);
+    j.at("type").get_to(p.type);
+}
+
 void Engine::from_json(const nlohmann::json& j, TiledTileSheetTileAnimationFrame& p) {
     j.at("duration").get_to(p.duration);
     p.duration /= 1000;
@@ -34,6 +47,9 @@ void Engine::from_json(const nlohmann::json& j, TiledTileSheetTile& p) {
     }
     if (j.contains("properties")) {
         j.at("properties").get_to(p.properties);
+    }
+    if (j.contains("objectgroup")) {
+        j.at("objectgroup").get_to(p.objectGroup);
     }
 }
 

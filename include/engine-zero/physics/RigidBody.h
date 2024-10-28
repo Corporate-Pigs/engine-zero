@@ -5,13 +5,25 @@
 #include "engine-zero/graphics/Transform.h"
 
 namespace Engine {
-
+ 
 class RigidBody {
    public:
-   private:
-    cppvec::Vec2 speed;
-    cppvec::Vec2 acceleration;
+    RigidBody(Transform* transform, bool movable = true);
+    uint32_t uid;
+    void setSpeed(float xSpeed, float ySpeed);
+    void stop();
+    bool isIntersecting(const RigidBody& other) const;
+    bool isMovable() const;
+    void applyGravity(const float magnitude);
+    void update(const double elapsedTime);
     Transform* transform;
+
+   private:
+    bool isStatic = false;
+    float mass = 1.0f;
+    cppvec::Vec2<float> speed = {0, 0};
+    cppvec::Vec2<float> acceleration = {0, 0};
+    
 };
 
 }  // namespace Engine

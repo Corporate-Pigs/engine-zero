@@ -5,6 +5,7 @@
 #include <variant>
 
 #include "engine-zero/graphics/Renderable.h"
+#include "engine-zero/physics/RigidBody.h"
 
 namespace Engine {
 
@@ -22,6 +23,7 @@ struct Tile {
 
     bool isCollidable = false;
     Renderable* sprite = nullptr;
+    RigidBody* rigidBody = nullptr;
     Transform transform;
 
     std::vector<Tile::Property> properties;
