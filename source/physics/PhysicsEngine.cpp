@@ -1,6 +1,6 @@
 #include "engine-zero/physics/PhysicsEngine.h"
 
-static constexpr auto k_gravity = 500.0f;
+static constexpr auto k_gravity = 9.81f;
 static constexpr auto k_nSteps = 1;
 
 Engine::RigidBody* Engine::PhysicsEngine::createRigidBody(Transform* transform, bool isMovable) { 
@@ -42,7 +42,6 @@ void Engine::PhysicsEngine::solveCollision(RigidBody* bodyA, RigidBody* bodyB) c
         verticalOverlap *= 0.5f;
     }
 
-
     if(horizontalOverlap < verticalOverlap) {
         if(rightBody->isMovable()) {
             rightBody->transform->mX += horizontalOverlap;
@@ -58,13 +57,13 @@ void Engine::PhysicsEngine::solveCollision(RigidBody* bodyA, RigidBody* bodyB) c
         if(topBody->isMovable()) {
             topBody->transform->mY -= verticalOverlap;
             topBody->isOnGround = true;
-            topBody->moveVertical(0.0f);
+            //topBody->moveVertical(0.0f);
         }
 
         if(bottomBody->isMovable()) {
             bottomBody->transform->mY += verticalOverlap;
             bottomBody->isOnGround = true;
-            bottomBody->moveVertical(0.0f);
+            //bottomBody->moveVertical(0.0f);
         }
     }
 
@@ -72,16 +71,16 @@ void Engine::PhysicsEngine::solveCollision(RigidBody* bodyA, RigidBody* bodyB) c
 
 void Engine::PhysicsEngine::update(const double elapsedTime) {
 
-    for(const auto& rigidBody : rigidBodies) {
-        rigidBody->isOnGround = false;
-    }
-
     for(uint16_t step = 0; step < k_nSteps; step++) {
 
         for(const auto& rigidBody : rigidBodies) {
             if(!rigidBody->isMovable()) continue;
             rigidBody->applyGravity(k_gravity);
-            rigidBody->update(elapsedTime / k_nSteps);
+            rigidBody->update(elapsedTime);
+        }
+
+        for(const auto& rigidBody : rigidBodies) {
+            rigidBody->isOnGround = false;
         }
 
         for(uint16_t indexA = 0; indexA < rigidBodies.size(); indexA++) {
@@ -89,12 +88,12 @@ void Engine::PhysicsEngine::update(const double elapsedTime) {
             for(uint16_t indexB = indexA + 1; indexB < rigidBodies.size(); indexB++) {
                 auto bodyB = rigidBodies[indexB].get();
                 if(!bodyA->isMovable() && !bodyB->isMovable()) continue;
-                
                 if(bodyA->isIntersecting(*bodyB)){
                     solveCollision(bodyA, bodyB);
                 }
             }
         }
+
     }
 
 }

@@ -35,7 +35,7 @@ void Engine::SDLUserInterface::start() {
     // Create window
     mWindow = SDL_CreateWindow(mOptions.windowTitle.c_str(),
                                // TODO: don't forget about these...
-                               100, 100, mOptions.windowWidth, mOptions.windowHeight, SDL_WINDOW_SHOWN);
+                               100 + 1080, 100, mOptions.windowWidth, mOptions.windowHeight, SDL_WINDOW_SHOWN);
 
     if (!mWindow) {
         std::string sdlError = SDL_GetError();
