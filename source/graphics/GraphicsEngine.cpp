@@ -1,5 +1,8 @@
 #include "engine-zero/graphics/GraphicsEngine.h"
 
+#include "engine-zero/resource/Tiled.h"
+#include "engine-zero/graphics/AnimatedSprite.h"
+
 Engine::GraphicsEngine::GraphicsEngine(const Options* options)
     : mWindowWidth(options->windowWidth), 
     mWindowHeight(options->windowHeight), 
@@ -8,6 +11,26 @@ Engine::GraphicsEngine::GraphicsEngine(const Options* options)
         mRenderingLayers[i].mIndex = i;
     }
 }
+
+Engine::Renderable* Engine::GraphicsEngine::createAnimatedSprite(const std::string sheetPath, uint32_t spriteId) {
+
+    Engine::TiledTileSheet tiledTileSheet;
+    Engine::TiledTileSheet::fromJson(sheetPath, tiledTileSheet);
+    const auto& sheetTile = tiledTileSheet.tiles[spriteId];
+
+    Engine::Rectangle spriteRectangle;
+    if (!sheetTile.keyframes.empty()) {
+        auto animatedSprite = new AnimatedSprite();
+        for (const auto& keyframe : sheetTile.keyframes) {
+            tiledTileSheet.computeRectangleForTileId(keyframe.tileId, spriteRectangle);
+            animatedSprite->addKeyframe(
+                {createSprite(tiledTileSheet.image, spriteRectangle), keyframe.duration});
+        }
+        mAnimatedSprites.push_back(std::unique_ptr<AnimatedSprite>(animatedSprite));
+        return animatedSprite;
+    }
+    return nullptr;
+};
 
 void Engine::GraphicsEngine::renderLayers() {
     // render and clear rendering layers
@@ -19,16 +42,20 @@ void Engine::GraphicsEngine::renderLayers() {
         auto layerPtr = &mRenderingLayers[i];
         while (!layerPtr->mRenderingUnits.empty()) {
             auto ru = &layerPtr->mRenderingUnits.back();
-            if (ru->renderable != nullptr) {
-                computeRenderingTransform(
-                    ru->transform, 
-                    renderingTransform,
-                    xScale,
-                    yScale);
-                ru->renderable->render(&renderingTransform);
-            }
+            computeRenderingTransform(
+                ru->transform, 
+                renderingTransform,
+                xScale,
+                yScale);
+            ru->renderable->render(&renderingTransform);
             layerPtr->mRenderingUnits.pop_back();
         }
+    }
+}
+
+void Engine::GraphicsEngine::updateAnimatedSprites(double elapsedTime) {
+    for(auto& sprite : mAnimatedSprites) {
+        sprite->update(elapsedTime);
     }
 }
 

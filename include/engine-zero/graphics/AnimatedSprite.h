@@ -3,25 +3,24 @@
 #include <memory>
 #include <vector>
 
-#include "engine-zero/core/Context.h"
 #include "engine-zero/graphics/Renderable.h"
-#include "engine-zero/graphics/Sprite.h"
 
 namespace Engine {
 
 class AnimatedSprite : public Renderable {
    public:
     struct Keyframe {
-        Sprite* sprite;
+        Renderable* sprite;
         double durationInSeconds;
     };
 
     virtual void render(const Transform* transform) const;
     void addKeyframe(const Keyframe& keyframe);
+    void update(double elapsedTime);
 
    private:
-    uint32_t mCurrentKeyframe;
-    double mElapsedTimeInSecondsForCurrentSprite;
+    uint32_t mCurrentKeyframe = 0;
+    double mElapsedTimeInSecondsForCurrentSprite = 0;
     std::vector<Keyframe> mKeyframes;
 };
 

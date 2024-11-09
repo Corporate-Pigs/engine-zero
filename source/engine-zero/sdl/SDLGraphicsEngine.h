@@ -11,12 +11,12 @@ class SDLGraphicsEngine : public Engine::GraphicsEngine {
    public:
     SDLGraphicsEngine(SDL_Window* window, Engine::Options* options);
 
-    virtual Sprite* createSprite(const std::string path, const Rectangle& subSpriteRectangle);
-    virtual void render(Renderable* sprite, const Transform* transform);
+    Renderable* createSprite(const std::string path, const Rectangle& subSpriteRectangle) override;
+    void render(Renderable* sprite, const Transform* transform) override;
 
-    virtual void start();
-    virtual void render();
-    virtual void destroy();
+    void start() override;
+    void render(double elapsedTime) override;
+    void destroy() override;
 
    private:
     SDL_Window* mWindow;

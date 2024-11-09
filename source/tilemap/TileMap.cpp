@@ -70,13 +70,7 @@ void Engine::TileMap::onStart(Context* context) {
             // setup sprite / animated sprite if applied
             Rectangle spriteRectangle;
             if (!sheetTile.keyframes.empty()) {
-                auto animatedSprite = new AnimatedSprite();
-                for (const auto& keyframe : sheetTile.keyframes) {
-                    tileSheet.computeRectangleForTileId(keyframe.tileId, spriteRectangle);
-                    animatedSprite->addKeyframe(
-                        {context->graphics->createSprite(tileSheet.image, spriteRectangle), keyframe.duration});
-                }
-                tile.sprite = animatedSprite;
+                tile.sprite = context->graphics->createAnimatedSprite(tileSetPtr->source, sheetTile.id);
             }
 
             // this isn't an animated sprite.

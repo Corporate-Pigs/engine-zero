@@ -11,7 +11,7 @@
 Engine::SDLGraphicsEngine::SDLGraphicsEngine(SDL_Window* window, Engine::Options* options)
     : Engine::GraphicsEngine(options), mWindow(window) {}
 
-Engine::Sprite* Engine::SDLGraphicsEngine::createSprite(const std::string path, const Rectangle& subSpriteRectangle) {
+Engine::Renderable* Engine::SDLGraphicsEngine::createSprite(const std::string path, const Rectangle& subSpriteRectangle) {
     // HACK: compute some uuid for this sprite based on its values
     std::string spriteUuid = path;
     spriteUuid += std::to_string(subSpriteRectangle.mX) + std::to_string(subSpriteRectangle.mY) +
@@ -65,10 +65,11 @@ void Engine::SDLGraphicsEngine::start() {
     }
 }
 
-void Engine::SDLGraphicsEngine::render() {
+void Engine::SDLGraphicsEngine::render(double elapsedTime) {
     SDL_SetRenderDrawColor(mRenderer, 0x55, 0x55, 0x55, 0xFF);
     SDL_RenderClear(mRenderer);
 
+    updateAnimatedSprites(elapsedTime);
     renderLayers();
 
     SDL_RenderPresent(mRenderer);

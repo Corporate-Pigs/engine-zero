@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "engine-zero/core/EngineOptions.h"
+#include "engine-zero/graphics/AnimatedSprite.h"
 #include "engine-zero/graphics/Camera.h"
 #include "engine-zero/graphics/Sprite.h"
 #include "engine-zero/graphics/Transform.h"
@@ -23,8 +24,9 @@ class GraphicsEngine {
     GraphicsEngine(const Options* options);
     virtual ~GraphicsEngine() = default;
 
-    virtual Sprite* createSprite(const std::string path, const Rectangle& subSpriteRectangle = {0, 0, 0, 0}) = 0;
+    virtual Renderable* createSprite(const std::string path, const Rectangle& subSpriteRectangle = {0, 0, 0, 0}) = 0;
     virtual void render(Renderable* sprite, const Transform* transform) = 0;
+    Renderable* createAnimatedSprite(const std::string sheetPath, uint32_t spriteId);
 
     void centerCameraOn(float x, float y);
     void centerCameraOn(float x);
@@ -56,18 +58,21 @@ class GraphicsEngine {
     // TODO: investigate changing this into a set for more fine grain layers
     RenderingLayer mRenderingLayers[GRAPHICS_ENGINE_RENDERING_LAYERS];
     std::map<std::string, std::unique_ptr<Sprite>> mSpriteCache;
+    std::vector<std::unique_ptr<AnimatedSprite>> mAnimatedSprites;
     Camera mCamera;
     float mWindowWidth, mWindowHeight;
 
     virtual void start() = 0;
-    virtual void render() = 0;
+    virtual void render(double elapsedTime) = 0;
     virtual void destroy() = 0;
 
     void renderLayers();
+    void updateAnimatedSprites(double elapsedTime);
     void destroyCaches();
 
    private:
-    void computeRenderingTransform(const Transform* objectTransform, Transform& renderingTransform, float xScale, float yScale);
+    void computeRenderingTransform(const Transform* objectTransform, Transform& renderingTransform, float xScale,
+                                   float yScale);
 
     friend class CoreEngine;
 };

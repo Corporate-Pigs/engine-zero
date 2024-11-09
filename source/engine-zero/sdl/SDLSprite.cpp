@@ -14,18 +14,16 @@ void Engine::SDLSprite::render(const Transform* transform) const {
     SDL_FRect screenRectangle;
     rectangleToSDLFRect(transform, &screenRectangle);
 
-    /* TODO: possible better performance 
     auto flipHorizontally = transform->mFlipHorizontally ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
     auto flipVertically = transform->mFlipVertically ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
     SDL_RendererFlip flipFlag = (SDL_RendererFlip)(flipHorizontally | flipVertically);
-    */
 
     if (mSubspriteRect.isDefault()) {
-        SDL_RenderCopyExF(mRenderer, mTexture, NULL, &screenRectangle, transform->mRotation, nullptr, SDL_FLIP_NONE);
+        SDL_RenderCopyExF(mRenderer, mTexture, NULL, &screenRectangle, transform->mRotation, nullptr, flipFlag);
         return;
     }
 
     SDL_Rect atlasRectangle;
     rectangleToSDLRect(&mSubspriteRect, &atlasRectangle);
-    SDL_RenderCopyExF(mRenderer, mTexture, &atlasRectangle, &screenRectangle, transform->mRotation, nullptr, SDL_FLIP_NONE);
+    SDL_RenderCopyExF(mRenderer, mTexture, &atlasRectangle, &screenRectangle, transform->mRotation, nullptr, flipFlag);
 }

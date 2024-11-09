@@ -47,7 +47,7 @@ void Engine::CoreEngine::start() {
 
         // render
         mGame->render(&context);
-        mGraphics->render();
+        mGraphics->render(context.elapsedTime);
     }
 
     // TODO: evaluate moving those intro their respective destructors.
