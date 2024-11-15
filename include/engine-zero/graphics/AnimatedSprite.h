@@ -17,6 +17,7 @@ class AnimatedSprite : public Renderable {
     virtual void render(const Transform* transform) const;
     void addKeyframe(const Keyframe& keyframe);
     void update(double elapsedTime);
+    void reset();
 
    private:
     uint32_t mCurrentKeyframe = 0;

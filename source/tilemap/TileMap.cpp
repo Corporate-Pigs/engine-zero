@@ -82,7 +82,14 @@ void Engine::TileMap::onStart(Context* context) {
             // setup rigid bodies
             for(const auto& object : sheetTile.objectGroup.objects) {
                 if(object.type == "collidable") {
-                    tile.rigidBody = context->physics->createRigidBody(&tile.transform, false);
+                    tile.rigidBody = context->physics->createRigidBody(
+                        new Transform(
+                            tile.transform.mX + object.x, 
+                            tile.transform.mY + object.y,
+                            object.width,
+                            object.height,
+                            tile.transform.mLayer
+                            ), false);
                 }
             }
 

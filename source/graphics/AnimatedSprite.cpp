@@ -19,3 +19,8 @@ void Engine::AnimatedSprite::update(double elapsedTime) {
         mCurrentKeyframe = ++mCurrentKeyframe % mKeyframes.size();
     }
 }
+
+void Engine::AnimatedSprite::reset() {
+    mElapsedTimeInSecondsForCurrentSprite = 0;
+    mCurrentKeyframe = 0;
+}
