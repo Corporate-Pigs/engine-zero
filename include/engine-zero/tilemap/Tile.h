@@ -4,7 +4,7 @@
 #include <vector>
 #include <variant>
 
-#include "engine-zero/graphics/Renderable.h"
+#include "engine-zero/graphics/Sprite.h"
 #include "engine-zero/physics/RigidBody.h"
 
 namespace Engine {

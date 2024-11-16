@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cppvec/vec2.h>
+
 #include <memory>
 
 #include "engine-zero/graphics/Renderable.h"
@@ -12,13 +14,13 @@ namespace Engine {
  */
 class Sprite : public Renderable {
    public:
-    Sprite() = default;
+    Sprite(cppvec::Vec2<float> size);
     Sprite(const Rectangle& subSpriteRect);
     virtual ~Sprite() = default;
-    virtual void render(const Transform* transform) const = 0;
+    virtual void render(const Transform& transform) const = 0;
 
    protected:
-    const Rectangle mSubspriteRect;
+    const std::unique_ptr<Rectangle> subspriteRectangle;
 };
 
 }  // namespace Engine

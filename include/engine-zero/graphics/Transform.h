@@ -12,13 +12,10 @@ namespace Engine {
 class Transform : public Rectangle {
    public:
     Transform() = default;
-    Transform(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint16_t layer);
-    Transform(float x, float y, float width, float height, uint16_t layer, bool flipVertically, bool flipHorizontally);
-    void combineWith(const Rectangle& transform);
+    Transform(float x, float y, float width, float height, uint16_t layer);
+    void concatenate(const Transform& transform);
     uint16_t mLayer = 0;
     float mRotation = 0;
-    bool mFlipVertically = false, mFlipHorizontally = false;
-    bool containtsPoint(float x, float y);
 };
 
 }  // namespace Engine

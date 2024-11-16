@@ -11,39 +11,33 @@
 Engine::SDLGraphicsEngine::SDLGraphicsEngine(SDL_Window* window, Engine::Options* options)
     : Engine::GraphicsEngine(options), mWindow(window) {}
 
-Engine::Renderable* Engine::SDLGraphicsEngine::createSprite(const std::string path, const Rectangle& subSpriteRectangle) {
-    // HACK: compute some uuid for this sprite based on its values
-    std::string spriteUuid = path;
-    spriteUuid += std::to_string(subSpriteRectangle.mX) + std::to_string(subSpriteRectangle.mY) +
-                  std::to_string(subSpriteRectangle.mHeight) + std::to_string(subSpriteRectangle.mWidth);
+Engine::Sprite* Engine::SDLGraphicsEngine::createSprite(const std::string path, const Rectangle* subSpriteRectangle) {
 
-    if (mSpriteCache.count(spriteUuid) == 0) {
-        if (mTextureCache.count(path) == 0) {
-            auto texture = createSDLTexture(path);
-            mTextureCache[path] = texture;
-        }
-
-        auto texture = mTextureCache[path];
-
-        Rectangle auxiliarRectangle = subSpriteRectangle;
-        if(subSpriteRectangle.isDefault()) {
-            int32_t w, h;
-            SDL_QueryTexture(texture, NULL, NULL, &w, &h);
-            auxiliarRectangle.mHeight = static_cast<float>(h);
-            auxiliarRectangle.mWidth = static_cast<float>(w);
-        }
-
-        auto sprite = new SDLSprite(texture, mRenderer, auxiliarRectangle);
-        mSpriteCache[spriteUuid].reset(sprite);
-        return sprite;
+    if (mTextureCache.count(path) == 0) {
+        auto texture = createSDLTexture(path);
+        mTextureCache[path] = texture;
     }
 
-    return mSpriteCache[spriteUuid].get();
+    auto texture = mTextureCache[path];
+
+    Rectangle auxiliarRectangle;
+    if(subSpriteRectangle == nullptr) {
+        int32_t w, h;
+        SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+        auxiliarRectangle.position = { 0.0f, 0.0f };
+        auxiliarRectangle.size = { static_cast<float>(w), static_cast<float>(h) };
+    }
+    else {
+        auxiliarRectangle = *subSpriteRectangle;
+    }
+
+    auto sprite = new SDLSprite(texture, mRenderer, auxiliarRectangle);
+    return sprite;
 }
 
-void Engine::SDLGraphicsEngine::render(Renderable* renderable, const Transform* transform) {
-    auto layer = &mRenderingLayers[transform->mLayer];
-    RenderingUnit ro = {renderable, transform};
+void Engine::SDLGraphicsEngine::render(const Renderable& renderable, const Transform& transform) {
+    auto layer = &mRenderingLayers[transform.mLayer];
+    RenderingUnit ro = {renderable, { transform.position.x, transform.position.y, renderable.getSize().x, renderable.getSize().y, transform.mLayer}};
     layer->mRenderingUnits.push_back(ro);
 }
 

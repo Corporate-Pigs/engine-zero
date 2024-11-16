@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cppvec/vec2.h>
+
 namespace Engine {
 
 /*
@@ -7,10 +9,10 @@ namespace Engine {
  */
 class Rectangle {
    public:
-    Rectangle() = default;
+    Rectangle();
     Rectangle(float x, float y, float width, float height);
-    float mX = 0.0f, mY = 0.0f, mWidth = 0.0f, mHeight = 0.0f;
-    bool isDefault() const;
+    cppvec::Vec2<float> position;
+    cppvec::Vec2<float> size;
     bool isIntersecting(const Rectangle& other);
 };
 

@@ -11,16 +11,17 @@ Engine::RigidBody* Engine::PhysicsEngine::createRigidBody(Transform* transform, 
 
 void Engine::PhysicsEngine::solveCollision(RigidBody* bodyA, RigidBody* bodyB) const {
 
+    /*
     // horizontal overlap computing
-    bool aIsToTheRight = bodyA->transform->mX > bodyB->transform->mX;
+    bool aIsToTheRight = bodyA->transform->position.x > bodyB->transform->position.x;
     RigidBody* rightBody = bodyA;
     RigidBody* leftBody = bodyB;
     if(!aIsToTheRight) {
         rightBody = bodyB;
         leftBody = bodyA;
     }
-    auto rightBodyLeft = rightBody->transform->mX;
-    auto leftBodyRight = leftBody->transform->mX + leftBody->transform->mWidth;
+    auto rightBodyLeft = rightBody->transform->position.x;
+    auto leftBodyRight = leftBody->transform->position.x + leftBody->transform->mWidth;
     auto horizontalOverlap = leftBodyRight - rightBodyLeft;
     if(horizontalOverlap < 0) horizontalOverlap = 0;
     
@@ -44,12 +45,12 @@ void Engine::PhysicsEngine::solveCollision(RigidBody* bodyA, RigidBody* bodyB) c
 
     if(horizontalOverlap < verticalOverlap) {
         if(rightBody->isMovable()) {
-            rightBody->transform->mX += horizontalOverlap;
+            rightBody->transform->position.x += horizontalOverlap;
             rightBody->moveHorizontal(0.0f);
         }
         
         if(leftBody->isMovable()) {
-            leftBody->transform->mX -= horizontalOverlap;
+            leftBody->transform->position.x -= horizontalOverlap;
             leftBody->moveHorizontal(0.0f);
         }
     }
@@ -65,7 +66,7 @@ void Engine::PhysicsEngine::solveCollision(RigidBody* bodyA, RigidBody* bodyB) c
             bottomBody->isOnGround = true;
             //bottomBody->moveVertical(0.0f);
         }
-    }
+    }*/
 
 }
 

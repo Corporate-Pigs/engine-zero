@@ -12,7 +12,7 @@ namespace Engine {
 
 class TileMap : public Engine::Actor {
    public:
-    TileMap(const Transform& transform, const std::string& filePath, uint16_t nVisibleColumns, uint16_t nVisibleRows);
+    TileMap(const Transform& transform, const std::string& filePath);
     virtual void onStart(Context* context) override; 
     virtual void onRender(Context* context) override;
 
@@ -23,8 +23,6 @@ class TileMap : public Engine::Actor {
     std::unique_ptr<TiledTileMap> tiledTileMap;
     std::map<std::string, TiledTileSheet> tiledTileSheets;
     std::vector<TileLayer> mTileLayers;
-    uint16_t nVisibleColumns;
-    uint16_t nVisibleRows;
     uint32_t mNumberOfColumns, mNumberOfRows, mTileHeight, mTileWidth;
 };
 

@@ -39,8 +39,7 @@ void Engine::RigidBody::update(const double elapsedTime) {
 
     float dt = static_cast<float>(elapsedTime) * 15.0f;
 
-    transform->mX += ((speed.x * dt) + (0.5 * acceleration.x * dt * dt));
-    transform->mY += ((speed.y * dt) + (0.5 * acceleration.y * dt * dt));
+    transform->position += ((speed * dt) + (acceleration * dt * dt * 0.5f));
 
     if(!isOnGround || speed.y < 0) {
         speed.y += acceleration.y * dt;

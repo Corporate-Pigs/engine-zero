@@ -4,8 +4,7 @@
 #include "engine-zero/resource/Tiled.h"
 
 Engine::GraphicsEngine::GraphicsEngine(const Options* options)
-    : mWindowWidth(options->windowWidth),
-      mWindowHeight(options->windowHeight),
+    : windowSize(options->windowWidth, options->windowHeight),
       mCamera({options->windowWidth * 0.25f, options->windowHeight * 0.25f,
                static_cast<float>(options->windowWidth * 0.5f), static_cast<float>(options->windowHeight * 0.5f)}) {
     for (int i = 0; i < GRAPHICS_ENGINE_RENDERING_LAYERS; i++) {
@@ -13,7 +12,7 @@ Engine::GraphicsEngine::GraphicsEngine(const Options* options)
     }
 }
 
-Engine::Renderable* Engine::GraphicsEngine::createAnimatedSprite(const std::string sheetPath, uint32_t spriteId) {
+Engine::AnimatedSprite* Engine::GraphicsEngine::createAnimatedSprite(const std::string sheetPath, uint32_t spriteId) {
     Engine::TiledTileSheet tiledTileSheet;
     Engine::TiledTileSheet::fromJson(sheetPath, tiledTileSheet);
     const auto& sheetTile = tiledTileSheet.tiles[spriteId];
@@ -23,11 +22,11 @@ Engine::Renderable* Engine::GraphicsEngine::createAnimatedSprite(const std::stri
         auto animatedSprite = new AnimatedSprite();
         for (const auto& keyframe : sheetTile.keyframes) {
             tiledTileSheet.computeRectangleForTileId(keyframe.tileId, spriteRectangle);
-            animatedSprite->addKeyframe({createSprite(tiledTileSheet.image, spriteRectangle), keyframe.duration});
+            auto sprite = std::shared_ptr<Sprite>(createSprite(tiledTileSheet.image, &spriteRectangle));
+
+            animatedSprite->addKeyframe({sprite, keyframe.duration});
         }
         mAnimatedSprites.push_back(std::unique_ptr<AnimatedSprite>(animatedSprite));
-        animatedSprite->width = spriteRectangle.mWidth;
-        animatedSprite->height = spriteRectangle.mHeight;
         return animatedSprite;
     }
     return nullptr;
@@ -36,15 +35,14 @@ Engine::Renderable* Engine::GraphicsEngine::createAnimatedSprite(const std::stri
 void Engine::GraphicsEngine::renderLayers() {
     // render and clear rendering layers
     Transform renderingTransform;
-    double xScale = mWindowWidth / mCamera.rectangle.mWidth;
-    double yScale = mWindowHeight / mCamera.rectangle.mHeight;
+    auto scale = windowSize / mCamera.rectangle.size;
 
     for (int i = 0; i < GRAPHICS_ENGINE_RENDERING_LAYERS; i++) {
         auto layerPtr = &mRenderingLayers[i];
         while (!layerPtr->mRenderingUnits.empty()) {
             auto ru = &layerPtr->mRenderingUnits.back();
-            computeRenderingTransform(ru->transform, renderingTransform, xScale, yScale);
-            ru->renderable->render(&renderingTransform);
+            computeRenderingTransform(&ru->transform, renderingTransform, scale);
+            ru->renderable.render(renderingTransform);
             layerPtr->mRenderingUnits.pop_back();
         }
     }
@@ -57,11 +55,11 @@ void Engine::GraphicsEngine::updateAnimatedSprites(double elapsedTime) {
 }
 
 void Engine::GraphicsEngine::centerCameraOn(float x, float y) {
-    mCamera.moveTo(x - mCamera.rectangle.mWidth * 0.5f, y - mCamera.rectangle.mHeight * 0.5f);
+    mCamera.moveTo(x - mCamera.rectangle.size.x * 0.5f, y - mCamera.rectangle.size.y * 0.5f);
 }
 
 void Engine::GraphicsEngine::centerCameraOn(float x) {
-    mCamera.moveTo(x - mCamera.rectangle.mWidth * 0.5f, mCamera.rectangle.mY);
+    mCamera.moveTo(x - mCamera.rectangle.size.y * 0.5f, mCamera.rectangle.position.x);
 }
 
 void Engine::GraphicsEngine::flush() {
@@ -72,17 +70,12 @@ void Engine::GraphicsEngine::flush() {
     destroyCaches();
 }
 
-void Engine::GraphicsEngine::destroyCaches() { mSpriteCache.clear(); }
+void Engine::GraphicsEngine::destroyCaches() {}
 
-void Engine::GraphicsEngine::computeRenderingTransform(const Transform* objectTransform, Transform& renderingTransform,
-                                                       float xScale, float yScale) {
+void Engine::GraphicsEngine::computeRenderingTransform(const Transform* objectTransform, Transform& renderingTransform, const cppvec::Vec2<float>& scale) {
     renderingTransform = *objectTransform;
 
-    renderingTransform.mX -= mCamera.rectangle.mX;
-    renderingTransform.mY -= mCamera.rectangle.mY;
-
-    renderingTransform.mX *= xScale;
-    renderingTransform.mY *= yScale;
-    renderingTransform.mWidth *= xScale;
-    renderingTransform.mHeight *= yScale;
+    renderingTransform.position -= mCamera.rectangle.position;
+    renderingTransform.position *= scale;
+    renderingTransform.size *= scale;
 }

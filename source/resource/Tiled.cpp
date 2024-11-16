@@ -3,9 +3,7 @@
 #include "engine-zero/resource/ResourceLoader.h"
 #include "engine-zero/resource/ResourceManager.h"
 
-void Engine::from_json(const nlohmann::json& j, TiledTileSheetTileObjectGroup& p) {
-    j.at("objects").get_to(p.objects);
-}
+void Engine::from_json(const nlohmann::json& j, TiledTileSheetTileObjectGroup& p) { j.at("objects").get_to(p.objects); }
 
 void Engine::from_json(const nlohmann::json& j, TiledTileSheetTileObject& p) {
     j.at("id").get_to(p.id);
@@ -64,7 +62,7 @@ void Engine::from_json(const nlohmann::json& j, TiledTileSheet& p) {
     if (j.contains("tiles")) {
         std::vector<TiledTileSheetTile> tiles;
         j.at("tiles").get_to(tiles);
-        for(const auto& tile : tiles) {
+        for (const auto& tile : tiles) {
             p.tiles[tile.id] = tile;
         }
     }
@@ -126,8 +124,6 @@ void Engine::TiledTileSheet::fromJson(std::string path, TiledTileSheet& p) {
 void Engine::TiledTileSheet::computeRectangleForTileId(uint32_t id, Rectangle& rectangle) const {
     uint32_t spriteRow = id / columns;
     uint32_t spriteColumn = id - (spriteRow * columns);
-    rectangle.mX = spriteColumn * tileWidth;
-    rectangle.mY = spriteRow * tileHeight;
-    rectangle.mHeight = tileHeight;
-    rectangle.mWidth = tileWidth;
+    rectangle.position = { static_cast<float>(spriteColumn * tileWidth), static_cast<float>(spriteRow * tileHeight) };
+    rectangle.size = { static_cast<float>(tileWidth), static_cast<float>(tileHeight) };
 }

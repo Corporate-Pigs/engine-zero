@@ -3,21 +3,22 @@
 #include <memory>
 #include <vector>
 
-#include "engine-zero/graphics/Renderable.h"
+#include "engine-zero/graphics/Sprite.h"
 
 namespace Engine {
 
 class AnimatedSprite : public Renderable {
    public:
     struct Keyframe {
-        Renderable* sprite;
+        std::shared_ptr<Sprite> sprite;
         double durationInSeconds;
     };
-
-    virtual void render(const Transform* transform) const;
+    virtual void render(const Transform& transform) const override;
     void addKeyframe(const Keyframe& keyframe);
     void update(double elapsedTime);
     void reset();
+    virtual void flipVertically(bool flip) override;
+    virtual void flipHorizontally(bool flip) override;
 
    private:
     uint32_t mCurrentKeyframe = 0;

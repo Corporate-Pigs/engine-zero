@@ -24,9 +24,9 @@ class GraphicsEngine {
     GraphicsEngine(const Options* options);
     virtual ~GraphicsEngine() = default;
 
-    virtual Renderable* createSprite(const std::string path, const Rectangle& subSpriteRectangle = {0, 0, 0, 0}) = 0;
-    virtual void render(Renderable* sprite, const Transform* transform) = 0;
-    Renderable* createAnimatedSprite(const std::string sheetPath, uint32_t spriteId);
+    virtual Sprite* createSprite(const std::string path, const Rectangle* subSpriteRectangle = nullptr) = 0;
+    virtual void render(const Renderable& renderable, const Transform& transform) = 0;
+    AnimatedSprite* createAnimatedSprite(const std::string sheetPath, uint32_t spriteId);
 
     void centerCameraOn(float x, float y);
     void centerCameraOn(float x);
@@ -41,8 +41,8 @@ class GraphicsEngine {
      * to render an unit to the screen (sprite, text, squares...)
      */
     struct RenderingUnit {
-        const Renderable* renderable;
-        const Transform* transform;
+        const Renderable& renderable;
+        const Transform transform;
     };
 
     /*
@@ -57,10 +57,9 @@ class GraphicsEngine {
 
     // TODO: investigate changing this into a set for more fine grain layers
     RenderingLayer mRenderingLayers[GRAPHICS_ENGINE_RENDERING_LAYERS];
-    std::map<std::string, std::unique_ptr<Sprite>> mSpriteCache;
     std::vector<std::unique_ptr<AnimatedSprite>> mAnimatedSprites;
     Camera mCamera;
-    float mWindowWidth, mWindowHeight;
+    cppvec::Vec2<float> windowSize;
 
     virtual void start() = 0;
     virtual void render(double elapsedTime) = 0;
@@ -71,8 +70,7 @@ class GraphicsEngine {
     void destroyCaches();
 
    private:
-    void computeRenderingTransform(const Transform* objectTransform, Transform& renderingTransform, float xScale,
-                                   float yScale);
+    void computeRenderingTransform(const Transform* objectTransform, Transform& renderingTransform, const cppvec::Vec2<float>& scale);
 
     friend class CoreEngine;
 };

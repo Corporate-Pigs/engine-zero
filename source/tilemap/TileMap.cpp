@@ -7,10 +7,8 @@ static constexpr unsigned FLIPPED_VERTICALLY_FLAG = 0x40000000;
 static constexpr unsigned FLIPPED_DIAGONALLY_FLAG = 0x20000000;
 static constexpr unsigned ROTATED_HEXAGONAL_120_FLAG = 0x10000000;
 
-Engine::TileMap::TileMap(const Transform& transform, const std::string& filePath, uint16_t nVisibleColumns, uint16_t nVisibleRows) : 
-    Actor(0, transform), 
-    nVisibleColumns(nVisibleColumns), 
-    nVisibleRows(nVisibleRows), 
+Engine::TileMap::TileMap(const Transform& transform, const std::string& filePath) : 
+    Actor(0, transform),
     tiledTileMap(new Engine::TiledTileMap())
 {
 
@@ -30,8 +28,8 @@ Engine::TileMap::TileMap(const Transform& transform, const std::string& filePath
     // setup dims
     mNumberOfColumns = tiledTileMap->width;
     mNumberOfRows = tiledTileMap->height;
-    mTileHeight = transform.mHeight / nVisibleRows;
-    mTileWidth = transform.mWidth / nVisibleColumns;
+    mTileHeight = tiledTileMap->tileHeight;
+    mTileWidth = tiledTileMap->tileWidth;
 }
 
 void Engine::TileMap::onStart(Context* context) {
@@ -53,7 +51,7 @@ void Engine::TileMap::onStart(Context* context) {
             // compute drawing position
             uint32_t tileRow = tileIndex / tiledTileMap->width;
             uint32_t tileColumn = tileIndex % tiledTileMap->width;
-            tile.transform = {tileColumn * mTileWidth, tileRow * mTileHeight, mTileWidth, mTileHeight,
+            tile.transform = {tileColumn * mTileWidth * 1.0f, tileRow * mTileHeight * 1.0f, mTileWidth * 1.0f, mTileHeight * 1.0f,
                               transform.mLayer};
 
             // find sheet
@@ -76,7 +74,7 @@ void Engine::TileMap::onStart(Context* context) {
             // this isn't an animated sprite.
             if (tile.sprite == nullptr) {
                 tileSheet.computeRectangleForTileId(sheetTileId, spriteRectangle);
-                tile.sprite = context->graphics->createSprite(tileSheet.image, spriteRectangle);
+                tile.sprite = context->graphics->createSprite(tileSheet.image, &spriteRectangle);
             }
 
             // setup rigid bodies
@@ -84,10 +82,10 @@ void Engine::TileMap::onStart(Context* context) {
                 if(object.type == "collidable") {
                     tile.rigidBody = context->physics->createRigidBody(
                         new Transform(
-                            tile.transform.mX + object.x, 
-                            tile.transform.mY + object.y,
-                            object.width,
-                            object.height,
+                            tile.transform.position.x + static_cast<float>(object.x), 
+                            tile.transform.position.y + static_cast<float>(object.y),
+                            static_cast<float>(object.width),
+                            static_cast<float>(object.height),
                             tile.transform.mLayer
                             ), false);
                 }
@@ -110,7 +108,7 @@ void Engine::TileMap::onRender(Context* context) {
             if (tile.sprite == nullptr) {
                 continue;
             }
-            context->graphics->render(tile.sprite, &tile.transform);
+            //context->graphics->render(tile.sprite, &tile.transform);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Engine {
 class SDLSprite : public Sprite {
    public:
     SDLSprite(SDL_Texture* texture, SDL_Renderer* renderer, const Rectangle& subSpriteRect);
-    virtual void render(const Transform* transform) const override;
+    virtual void render(const Transform& transform) const override;
 
    private:
     SDL_Texture* mTexture;
