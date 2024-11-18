@@ -2,51 +2,57 @@
 
 #include <stdio.h>
 
-Engine::RigidBody::RigidBody(Transform* transform, bool movable) : transform(transform), isStatic(!movable) {}
-
-void Engine::RigidBody::moveHorizontal(const float speed) {
-    if(isOnGround) {
-        this->speed.x = speed;
+Engine::RigidBody::RigidBody(Transform* bindedTransform, const Rectangle<float>& collisionBox, bool movable)
+    : bindedTransform(bindedTransform), collisionBox(collisionBox), isStatic(!movable) {
+    if (bindedTransform != nullptr) {
+        this->collisionBox.position += bindedTransform->position;
     }
 }
 
-void Engine::RigidBody::moveVertical(const float speed) {
-    if(isOnGround) {
-        this->speed.y = speed;
-    }
+void Engine::RigidBody::move(const cppvec::Vec2<float>& delta) {
+    bindedTransform->position += delta;
+    collisionBox.position += delta;
 }
+
+void Engine::RigidBody::setSpeed(const cppvec::Vec2<float>& speed) { this->speed = speed; }
+
+void Engine::RigidBody::setHorizontalSpeed(float speed) { this->speed.x = speed; }
+
+void Engine::RigidBody::setVerticalSpeed(float speed) { this->speed.y = speed; }
 
 void Engine::RigidBody::stop() {
-    if(isStatic) return;
+    if (isStatic) return;
     speed.x = 0;
 }
 
-bool Engine::RigidBody::isMovable() const {
-    return !isStatic;
+bool Engine::RigidBody::isMovable() const { return !isStatic; }
+
+bool Engine::RigidBody::isIntersecting(const RigidBody& other) {
+    return collisionBox.isIntersecting(other.collisionBox);
 }
 
-bool Engine::RigidBody::isIntersecting(const RigidBody& other) const {
-    return transform->isIntersecting(*other.transform);
-}
-
-void Engine::RigidBody::applyGravity(const float magnitude) {
-    if(isStatic) return;
-    acceleration.y = magnitude;
+void Engine::RigidBody::setAcceleration(const cppvec::Vec2<float>& force) {
+    if (isStatic) return;
+    acceleration = force;
 }
 
 void Engine::RigidBody::update(const double elapsedTime) {
-    if(isStatic) return;
+    if (isStatic) return;
 
-    float dt = static_cast<float>(elapsedTime) * 15.0f;
+    float dt = static_cast<float>(elapsedTime);
+    auto auxiliarAcceleration = acceleration * dt * dt;
+    speed += auxiliarAcceleration;
+    auto positionDelta = (speed * dt) + auxiliarAcceleration;
 
-    transform->position += ((speed * dt) + (acceleration * dt * dt * 0.5f));
+    move(positionDelta);
 
-    if(!isOnGround || speed.y < 0) {
-        speed.y += acceleration.y * dt;
-    }
-    else {
-        speed.y = 0;
-    }
-    
-    printf("%d - %f\n",isOnGround, speed.y);
+    //printf("bt: %f cb: %f\n", bindedTransform->position.x, collisionBox.position.x);
+    printf("s: %f %f\n", speed.x, speed.y);
+
+    // printf("%d - %f\n",isOnGround, transform->position.y);
 }
+
+bool Engine::RigidBody::hasCollision() {
+    return isColliding;
+}
+ 

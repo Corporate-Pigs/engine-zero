@@ -17,6 +17,8 @@ class AnimatedSprite : public Renderable {
     void addKeyframe(const Keyframe& keyframe);
     void update(double elapsedTime);
     void reset();
+    bool isOver();
+    void setLoop(bool loop);
     virtual void flipVertically(bool flip) override;
     virtual void flipHorizontally(bool flip) override;
 
@@ -24,6 +26,8 @@ class AnimatedSprite : public Renderable {
     uint32_t mCurrentKeyframe = 0;
     double mElapsedTimeInSecondsForCurrentSprite = 0;
     std::vector<Keyframe> mKeyframes;
+    bool loop = true;
+    bool mIsOver = false;
 };
 
 }  // namespace Engine

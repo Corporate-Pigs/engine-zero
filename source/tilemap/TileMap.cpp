@@ -7,11 +7,8 @@ static constexpr unsigned FLIPPED_VERTICALLY_FLAG = 0x40000000;
 static constexpr unsigned FLIPPED_DIAGONALLY_FLAG = 0x20000000;
 static constexpr unsigned ROTATED_HEXAGONAL_120_FLAG = 0x10000000;
 
-Engine::TileMap::TileMap(const Transform& transform, const std::string& filePath) : 
-    Actor(0, transform),
-    tiledTileMap(new Engine::TiledTileMap())
-{
-
+Engine::TileMap::TileMap(const Transform& transform, const std::string& filePath)
+    : Actor(0, transform), tiledTileMap(new Engine::TiledTileMap()) {
     // load tile map from json file
     TiledTileMap::fromJson(filePath, *tiledTileMap);
 
@@ -33,7 +30,6 @@ Engine::TileMap::TileMap(const Transform& transform, const std::string& filePath
 }
 
 void Engine::TileMap::onStart(Context* context) {
-    
     // create tile map layers
     for (uint16_t layerIndex = 0; layerIndex < tiledTileMap->layers.size(); layerIndex++) {
         TiledTileMapLayer& layer = tiledTileMap->layers[layerIndex];
@@ -51,8 +47,7 @@ void Engine::TileMap::onStart(Context* context) {
             // compute drawing position
             uint32_t tileRow = tileIndex / tiledTileMap->width;
             uint32_t tileColumn = tileIndex % tiledTileMap->width;
-            tile.transform = {tileColumn * mTileWidth * 1.0f, tileRow * mTileHeight * 1.0f, mTileWidth * 1.0f, mTileHeight * 1.0f,
-                              transform.mLayer};
+            tile.transform = {{tileColumn * mTileWidth * 1.0f, tileRow * mTileHeight * 1.0f}, transform.layer};
 
             // find sheet
             auto tileSetPtr = tiledTileMap->getTileSetPtrForTileId(globalTileId);
@@ -66,7 +61,7 @@ void Engine::TileMap::onStart(Context* context) {
             }
 
             // setup sprite / animated sprite if applied
-            Rectangle spriteRectangle;
+            Rectangle<int32_t> spriteRectangle;
             if (!sheetTile.keyframes.empty()) {
                 tile.sprite = context->graphics->createAnimatedSprite(tileSetPtr->source, sheetTile.id);
             }
@@ -74,23 +69,19 @@ void Engine::TileMap::onStart(Context* context) {
             // this isn't an animated sprite.
             if (tile.sprite == nullptr) {
                 tileSheet.computeRectangleForTileId(sheetTileId, spriteRectangle);
-                tile.sprite = context->graphics->createSprite(tileSheet.image, &spriteRectangle);
+                tile.sprite = context->graphics->createSprite(tileSheet.image, spriteRectangle);
             }
 
             // setup rigid bodies
-            for(const auto& object : sheetTile.objectGroup.objects) {
-                if(object.type == "collidable") {
-                    tile.rigidBody = context->physics->createRigidBody(
-                        new Transform(
-                            tile.transform.position.x + static_cast<float>(object.x), 
-                            tile.transform.position.y + static_cast<float>(object.y),
-                            static_cast<float>(object.width),
-                            static_cast<float>(object.height),
-                            tile.transform.mLayer
-                            ), false);
+            for (const auto& object : sheetTile.objectGroup.objects) {
+                if (object.type == "BoundingBox") {
+                    tile.rigidBody = 
+                        context->physics->createRigidBody(
+                            nullptr, 
+                            {tile.transform.position.x + object.x, tile.transform.position.y + object.y, object.width, object.height}, 
+                            false);
                 }
             }
-
         }
     }
 
@@ -108,15 +99,11 @@ void Engine::TileMap::onRender(Context* context) {
             if (tile.sprite == nullptr) {
                 continue;
             }
-            //context->graphics->render(tile.sprite, &tile.transform);
+            context->graphics->render(*tile.sprite, tile.transform);
         }
     }
 }
 
-uint32_t Engine::TileMap::getTileHeight() { 
-    return mTileHeight; 
-};
+uint32_t Engine::TileMap::getTileHeight() { return mTileHeight; };
 
-uint32_t Engine::TileMap::getTileWidth() { 
-    return mTileWidth; 
-};
+uint32_t Engine::TileMap::getTileWidth() { return mTileWidth; };

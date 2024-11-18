@@ -121,9 +121,9 @@ void Engine::TiledTileSheet::fromJson(std::string path, TiledTileSheet& p) {
     p = json.get<Engine::TiledTileSheet>();
 }
 
-void Engine::TiledTileSheet::computeRectangleForTileId(uint32_t id, Rectangle& rectangle) const {
+void Engine::TiledTileSheet::computeRectangleForTileId(uint32_t id, Rectangle<int32_t>& rectangle) const {
     uint32_t spriteRow = id / columns;
     uint32_t spriteColumn = id - (spriteRow * columns);
-    rectangle.position = { static_cast<float>(spriteColumn * tileWidth), static_cast<float>(spriteRow * tileHeight) };
-    rectangle.size = { static_cast<float>(tileWidth), static_cast<float>(tileHeight) };
+    rectangle.position = { static_cast<int32_t>(spriteColumn * tileWidth), static_cast<int32_t>(spriteRow * tileHeight) };
+    rectangle.size = { static_cast<int32_t>(tileWidth), static_cast<int32_t>(tileHeight) };
 }

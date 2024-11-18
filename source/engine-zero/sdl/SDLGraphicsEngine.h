@@ -11,7 +11,8 @@ class SDLGraphicsEngine : public Engine::GraphicsEngine {
    public:
     SDLGraphicsEngine(SDL_Window* window, Engine::Options* options);
 
-    Sprite* createSprite(const std::string path, const Rectangle* subSpriteRectangle) override;
+    Sprite* createSprite(const std::string path) override;
+    Sprite* createSprite(const std::string path, const Rectangle<int32_t>& subSpriteRectangle) override;
     void render(const Renderable& renderable, const Transform& transform) override;
 
     void start() override;

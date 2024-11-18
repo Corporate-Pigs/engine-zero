@@ -5,8 +5,7 @@
 
 Engine::GraphicsEngine::GraphicsEngine(const Options* options)
     : windowSize(options->windowWidth, options->windowHeight),
-      mCamera({options->windowWidth * 0.25f, options->windowHeight * 0.25f,
-               static_cast<float>(options->windowWidth * 0.5f), static_cast<float>(options->windowHeight * 0.5f)}) {
+      mCamera({0.0f, 0.0f, options->windowWidth * 0.5f, options->windowHeight * 0.5f}, { options->windowWidth, options->windowHeight } ) {
     for (int i = 0; i < GRAPHICS_ENGINE_RENDERING_LAYERS; i++) {
         mRenderingLayers[i].mIndex = i;
     }
@@ -17,13 +16,10 @@ Engine::AnimatedSprite* Engine::GraphicsEngine::createAnimatedSprite(const std::
     Engine::TiledTileSheet::fromJson(sheetPath, tiledTileSheet);
     const auto& sheetTile = tiledTileSheet.tiles[spriteId];
 
-    Engine::Rectangle spriteRectangle;
     if (!sheetTile.keyframes.empty()) {
         auto animatedSprite = new AnimatedSprite();
         for (const auto& keyframe : sheetTile.keyframes) {
-            tiledTileSheet.computeRectangleForTileId(keyframe.tileId, spriteRectangle);
-            auto sprite = std::shared_ptr<Sprite>(createSprite(tiledTileSheet.image, &spriteRectangle));
-
+            auto sprite = std::shared_ptr<Sprite>(createSpriteFromSheet(sheetPath, keyframe.tileId));
             animatedSprite->addKeyframe({sprite, keyframe.duration});
         }
         mAnimatedSprites.push_back(std::unique_ptr<AnimatedSprite>(animatedSprite));
@@ -32,17 +28,39 @@ Engine::AnimatedSprite* Engine::GraphicsEngine::createAnimatedSprite(const std::
     return nullptr;
 };
 
+Engine::Sprite* Engine::GraphicsEngine::createSpriteFromSheet(const std::string sheetPath, uint32_t spriteId) {
+    Engine::TiledTileSheet tiledTileSheet;
+    Engine::TiledTileSheet::fromJson(sheetPath, tiledTileSheet);
+    const auto& sheetTile = tiledTileSheet.tiles[spriteId];
+
+    Engine::Rectangle<int32_t> spriteRectangle;
+    tiledTileSheet.computeRectangleForTileId(spriteId, spriteRectangle);
+    auto sprite = createSprite(tiledTileSheet.image, spriteRectangle);
+    
+    for(const auto& object : sheetTile.objectGroup.objects) {
+        if(object.type == "BoundingBox") {
+            sprite->boundingRectangle.position.x = object.x;
+            sprite->boundingRectangle.position.y = object.y;
+            sprite->boundingRectangle.size.x = object.width;
+            sprite->boundingRectangle.size.y = object.height;
+        }
+    }
+
+    return sprite;
+};
+
 void Engine::GraphicsEngine::renderLayers() {
     // render and clear rendering layers
-    Transform renderingTransform;
-    auto scale = windowSize / mCamera.rectangle.size;
+    
+    Transform viewTransform = mCamera.getTransform();
 
     for (int i = 0; i < GRAPHICS_ENGINE_RENDERING_LAYERS; i++) {
         auto layerPtr = &mRenderingLayers[i];
         while (!layerPtr->mRenderingUnits.empty()) {
             auto ru = &layerPtr->mRenderingUnits.back();
-            computeRenderingTransform(&ru->transform, renderingTransform, scale);
-            ru->renderable.render(renderingTransform);
+            auto modelTransform = &ru->transform;
+            Transform mvpTransform = *modelTransform * viewTransform;
+            ru->renderable.render(mvpTransform);
             layerPtr->mRenderingUnits.pop_back();
         }
     }
@@ -71,11 +89,3 @@ void Engine::GraphicsEngine::flush() {
 }
 
 void Engine::GraphicsEngine::destroyCaches() {}
-
-void Engine::GraphicsEngine::computeRenderingTransform(const Transform* objectTransform, Transform& renderingTransform, const cppvec::Vec2<float>& scale) {
-    renderingTransform = *objectTransform;
-
-    renderingTransform.position -= mCamera.rectangle.position;
-    renderingTransform.position *= scale;
-    renderingTransform.size *= scale;
-}

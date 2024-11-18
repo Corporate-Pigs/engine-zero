@@ -13,7 +13,7 @@ struct TiledTileSheetTileAnimationFrame {
 };
 
 struct TiledTileSheetTileObject {
-    uint32_t id, x, y, height, width;
+    float id, x, y, height, width;
     std::string type;
 };
 
@@ -39,7 +39,7 @@ struct TiledTileSheet {
     uint32_t id, columns, rows, tileWidth, tileHeight, imageWidth, imageHeight;
     std::map<uint32_t, TiledTileSheetTile> tiles;
     static void fromJson(std::string path, TiledTileSheet& p);
-    void computeRectangleForTileId(uint32_t id, Rectangle& rectangle) const;
+    void computeRectangleForTileId(uint32_t id, Rectangle<int32_t>& rectangle) const;
 };
 
 struct TiledTileMapLayerObject {

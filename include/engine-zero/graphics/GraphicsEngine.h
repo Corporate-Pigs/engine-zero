@@ -24,9 +24,11 @@ class GraphicsEngine {
     GraphicsEngine(const Options* options);
     virtual ~GraphicsEngine() = default;
 
-    virtual Sprite* createSprite(const std::string path, const Rectangle* subSpriteRectangle = nullptr) = 0;
-    virtual void render(const Renderable& renderable, const Transform& transform) = 0;
+    virtual Sprite* createSprite(const std::string path) = 0;
+    virtual Sprite* createSprite(const std::string path, const Rectangle<int32_t>& subSpriteRectangle) = 0;
+    Sprite* createSpriteFromSheet(const std::string sheetPath, uint32_t spriteId);
     AnimatedSprite* createAnimatedSprite(const std::string sheetPath, uint32_t spriteId);
+    virtual void render(const Renderable& renderable, const Transform& transform) = 0;
 
     void centerCameraOn(float x, float y);
     void centerCameraOn(float x);
@@ -68,10 +70,7 @@ class GraphicsEngine {
     void renderLayers();
     void updateAnimatedSprites(double elapsedTime);
     void destroyCaches();
-
-   private:
-    void computeRenderingTransform(const Transform* objectTransform, Transform& renderingTransform, const cppvec::Vec2<float>& scale);
-
+    
     friend class CoreEngine;
 };
 

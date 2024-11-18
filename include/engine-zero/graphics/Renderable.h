@@ -14,16 +14,20 @@ class Renderable {
     Renderable();
     Renderable(const cppvec::Vec2<float>& size);
     virtual ~Renderable();
-    virtual void render(const Transform& transform) const = 0;
     int getAlpha();
-    void setAlpha(int alpha);
+    void setAlpha(uint8_t alpha);
     const cppvec::Vec2<float>& getSize() const;
+    const Rectangle<float>& getBoundingRectangle() const;
+
     virtual void flipVertically(bool flip);
     virtual void flipHorizontally(bool flip);
     
+    virtual void render(const Transform& transform) const = 0;
+
    protected:
     uint8_t mAlpha;
     cppvec::Vec2<float> size;
+    Rectangle<float> boundingRectangle;
     bool mFlipVertically = false, mFlipHorizontally = false;
 };
 

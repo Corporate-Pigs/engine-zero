@@ -11,8 +11,7 @@ namespace Engine {
 
 class PhysicsEngine {
    public:
-    RigidBody* createRigidBody(Transform* transform, bool isMovable = true);
-    RigidBody* getRigidBodyById(uint32_t id);
+    RigidBody* createRigidBody(Transform* transform, const Rectangle<float> collisionBox, bool isMovable = true);
     void update(const double elapsedTime);
 
    private:

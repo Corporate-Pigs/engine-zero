@@ -7,37 +7,38 @@
 #include "engine-zero/resource/ResourceManager.h"
 #include "engine-zero/sdl/SDLSprite.h"
 #include "engine-zero/tools/Logger.h"
+#include "SDLGraphicsEngine.h"
 
 Engine::SDLGraphicsEngine::SDLGraphicsEngine(SDL_Window* window, Engine::Options* options)
     : Engine::GraphicsEngine(options), mWindow(window) {}
 
-Engine::Sprite* Engine::SDLGraphicsEngine::createSprite(const std::string path, const Rectangle* subSpriteRectangle) {
+Engine::Sprite* Engine::SDLGraphicsEngine::createSprite(const std::string path) { 
 
     if (mTextureCache.count(path) == 0) {
         auto texture = createSDLTexture(path);
         mTextureCache[path] = texture;
     }
-
     auto texture = mTextureCache[path];
+    Rectangle<int32_t> auxiliarSubspriteRectangle;
+    SDL_QueryTexture(texture, NULL, NULL, &auxiliarSubspriteRectangle.size.x, &auxiliarSubspriteRectangle.size.y);
+    auxiliarSubspriteRectangle.position = { 0, 0 };
 
-    Rectangle auxiliarRectangle;
-    if(subSpriteRectangle == nullptr) {
-        int32_t w, h;
-        SDL_QueryTexture(texture, NULL, NULL, &w, &h);
-        auxiliarRectangle.position = { 0.0f, 0.0f };
-        auxiliarRectangle.size = { static_cast<float>(w), static_cast<float>(h) };
-    }
-    else {
-        auxiliarRectangle = *subSpriteRectangle;
-    }
+    return createSprite(path, auxiliarSubspriteRectangle); 
+}
 
-    auto sprite = new SDLSprite(texture, mRenderer, auxiliarRectangle);
+Engine::Sprite* Engine::SDLGraphicsEngine::createSprite(const std::string path, const Rectangle<int32_t>& subSpriteRectangle) {
+    if (mTextureCache.count(path) == 0) {
+        auto texture = createSDLTexture(path);
+        mTextureCache[path] = texture;
+    }
+    auto texture = mTextureCache[path];
+    auto sprite = new SDLSprite(texture, mRenderer, subSpriteRectangle);
     return sprite;
 }
 
 void Engine::SDLGraphicsEngine::render(const Renderable& renderable, const Transform& transform) {
-    auto layer = &mRenderingLayers[transform.mLayer];
-    RenderingUnit ro = {renderable, { transform.position.x, transform.position.y, renderable.getSize().x, renderable.getSize().y, transform.mLayer}};
+    auto layer = &mRenderingLayers[transform.layer];
+    RenderingUnit ro = {renderable, transform};
     layer->mRenderingUnits.push_back(ro);
 }
 
