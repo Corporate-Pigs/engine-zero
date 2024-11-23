@@ -11,6 +11,7 @@ class RigidBody {
    public:
     RigidBody(Transform* bindedTransform, const Rectangle<float>& collisionBox, bool movable = true);
     void move(const cppvec::Vec2<float>& delta);
+    void setCollisionBox(const Rectangle<float>& collisionBox);
     void setHorizontalSpeed(float speed);
     void setVerticalSpeed(float speed);
     void setSpeed(const cppvec::Vec2<float>& speed);

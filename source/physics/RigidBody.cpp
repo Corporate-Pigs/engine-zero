@@ -14,6 +14,13 @@ void Engine::RigidBody::move(const cppvec::Vec2<float>& delta) {
     collisionBox.position += delta;
 }
 
+void Engine::RigidBody::setCollisionBox(const Rectangle<float>& collisionBox) {
+    this->collisionBox = collisionBox;
+    if (bindedTransform != nullptr) {
+        this->collisionBox.position += bindedTransform->position;
+    }
+}
+
 void Engine::RigidBody::setAcceleration(const cppvec::Vec2<float>& force) {
     if (isStatic) return;
     acceleration = force;

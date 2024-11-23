@@ -47,8 +47,7 @@ void Engine::PhysicsEngine::solveCollision(RigidBody* bodyA, RigidBody* bodyB) c
     }
 
     printf("HO: %f, VO: %f\n", horizontalOverlap, verticalOverlap);
-
-    float bias = 3.5f;
+    float bias = 4.5f;
 
     if ((horizontalOverlap * bias) < verticalOverlap) {
         if (rightBody->isMovable()) {
@@ -99,5 +98,4 @@ void Engine::PhysicsEngine::update(const double elapsedTime) {
             }
         }
     }
-    //printf("\n");
 }

@@ -33,7 +33,7 @@ void Engine::CoreEngine::start() {
 
     while (mUI->isRunning()) {
         double current = mUI->getTime();
-        context.elapsedTime = 0.015;
+        context.elapsedTime = current - previous;
         previous = current;
 
         //printf("%f\n", context.elapsedTime);
