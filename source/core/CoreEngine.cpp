@@ -33,9 +33,10 @@ void Engine::CoreEngine::start() {
 
     while (mUI->isRunning()) {
         double current = mUI->getTime();
-        context.elapsedTime = current - previous;
+        context.elapsedTime = 0.015;
         previous = current;
 
+        //printf("%f\n", context.elapsedTime);
         // update window and handle input events
         mUI->update();
 

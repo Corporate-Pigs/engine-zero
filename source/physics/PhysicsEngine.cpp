@@ -1,7 +1,7 @@
 #include "engine-zero/physics/PhysicsEngine.h"
 
-static const cppvec::Vec2<float> k_gravity = {0.0f, 20.0f};
-static constexpr auto k_nSteps = 10;
+static const cppvec::Vec2<float> k_gravity = {0.0f, 1.0f};
+static constexpr auto k_nSteps = 1;
 
 Engine::RigidBody* Engine::PhysicsEngine::createRigidBody(Transform* transform, const Rectangle<float> collisionBox,
                                                           bool isMovable) {
@@ -46,34 +46,46 @@ void Engine::PhysicsEngine::solveCollision(RigidBody* bodyA, RigidBody* bodyB) c
         verticalOverlap *= 0.5f;
     }
 
-    if (horizontalOverlap < verticalOverlap) {
+    printf("HO: %f, VO: %f\n", horizontalOverlap, verticalOverlap);
+
+    float bias = 3.5f;
+
+    if ((horizontalOverlap * bias) < verticalOverlap) {
         if (rightBody->isMovable()) {
             rightBody->move({horizontalOverlap, 0.0f});
             rightBody->setHorizontalSpeed(0.0f);
+            //printf("Collision to the left!\n");
         }
         if (leftBody->isMovable()) {
             leftBody->move({-horizontalOverlap, 0.0f});
             leftBody->setHorizontalSpeed(0.0f);
+            //printf("Collision to the right!\n");
         }
     } else {
         if (topBody->isMovable()) {
             topBody->move({0.0f, -verticalOverlap});
             topBody->setVerticalSpeed(0.0f);
+            //printf("Collision from bottom!\n");
         }
         if (bottomBody->isMovable()) {
             bottomBody->move({0.0f, verticalOverlap});
             bottomBody->setVerticalSpeed(0.0f);
+            //printf("Collision from up!\n");
         }
     }
 }
 
 void Engine::PhysicsEngine::update(const double elapsedTime) {
+    for (const auto& rigidBody : rigidBodies) {
+        if (!rigidBody->isMovable()) continue;
+        rigidBody->isColliding = false;
+    }
+
+    auto elpsedStep = elapsedTime / k_nSteps;
     for (uint16_t step = 0; step < k_nSteps; step++) {
         for (const auto& rigidBody : rigidBodies) {
             if (!rigidBody->isMovable()) continue;
-            rigidBody->setAcceleration(k_gravity);
-            rigidBody->update(elapsedTime);
-            rigidBody->isColliding = false;
+            rigidBody->update(elpsedStep);
         }
 
         for (uint16_t indexA = 0; indexA < rigidBodies.size(); indexA++) {
@@ -87,4 +99,5 @@ void Engine::PhysicsEngine::update(const double elapsedTime) {
             }
         }
     }
+    //printf("\n");
 }

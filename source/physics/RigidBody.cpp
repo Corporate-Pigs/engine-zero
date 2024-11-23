@@ -14,26 +14,21 @@ void Engine::RigidBody::move(const cppvec::Vec2<float>& delta) {
     collisionBox.position += delta;
 }
 
+void Engine::RigidBody::setAcceleration(const cppvec::Vec2<float>& force) {
+    if (isStatic) return;
+    acceleration = force;
+}
+
 void Engine::RigidBody::setSpeed(const cppvec::Vec2<float>& speed) { this->speed = speed; }
 
 void Engine::RigidBody::setHorizontalSpeed(float speed) { this->speed.x = speed; }
 
 void Engine::RigidBody::setVerticalSpeed(float speed) { this->speed.y = speed; }
 
-void Engine::RigidBody::stop() {
-    if (isStatic) return;
-    speed.x = 0;
-}
-
 bool Engine::RigidBody::isMovable() const { return !isStatic; }
 
 bool Engine::RigidBody::isIntersecting(const RigidBody& other) {
     return collisionBox.isIntersecting(other.collisionBox);
-}
-
-void Engine::RigidBody::setAcceleration(const cppvec::Vec2<float>& force) {
-    if (isStatic) return;
-    acceleration = force;
 }
 
 void Engine::RigidBody::update(const double elapsedTime) {
@@ -46,13 +41,10 @@ void Engine::RigidBody::update(const double elapsedTime) {
 
     move(positionDelta);
 
-    //printf("bt: %f cb: %f\n", bindedTransform->position.x, collisionBox.position.x);
-    printf("s: %f %f\n", speed.x, speed.y);
-
+    // printf("s: %f %f\n", speed.x, speed.y);
     // printf("%d - %f\n",isOnGround, transform->position.y);
 }
 
-bool Engine::RigidBody::hasCollision() {
-    return isColliding;
-}
- 
+bool Engine::RigidBody::hasCollision() { return isColliding; }
+
+const cppvec::Vec2<float>& Engine::RigidBody::getSpeed() { return speed; }

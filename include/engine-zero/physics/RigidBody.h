@@ -15,11 +15,12 @@ class RigidBody {
     void setVerticalSpeed(float speed);
     void setSpeed(const cppvec::Vec2<float>& speed);
     void setAcceleration(const cppvec::Vec2<float>& force);
-    void stop();
     bool isIntersecting(const RigidBody& other);
     bool isMovable() const;
     void update(const double elapsedTime);
     bool hasCollision();
+
+    const cppvec::Vec2<float>& getSpeed();
 
    private:
     uint32_t uid;
