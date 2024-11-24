@@ -22,9 +22,9 @@ class RigidBody {
     bool hasCollision();
 
     const cppvec::Vec2<float>& getSpeed();
+    uint32_t uid;
 
    private:
-    uint32_t uid;
     bool isStatic = false;
     bool isColliding = false;
     float mass = 1.0f;
