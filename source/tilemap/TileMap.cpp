@@ -6,6 +6,7 @@ static constexpr unsigned FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
 static constexpr unsigned FLIPPED_VERTICALLY_FLAG = 0x40000000;
 static constexpr unsigned FLIPPED_DIAGONALLY_FLAG = 0x20000000;
 static constexpr unsigned ROTATED_HEXAGONAL_120_FLAG = 0x10000000;
+static constexpr auto k_tileCollisionBoxId = "tilecb";
 
 Engine::TileMap::TileMap(const Transform& transform, const std::string& filePath)
     : Actor(0, transform), tiledTileMap(new Engine::TiledTileMap()) {
@@ -75,11 +76,12 @@ void Engine::TileMap::onStart(Context* context) {
             // setup rigid bodies
             for (const auto& object : sheetTile.objectGroup.objects) {
                 if (object.type == "BoundingBox") {
-                    tile.rigidBody = 
-                        context->physics->createRigidBody(
-                            nullptr, 
-                            {tile.transform.position.x + object.x, tile.transform.position.y + object.y, object.width, object.height}, 
-                            false);
+                    tile.rigidBody = context->physics->createCollisionBox(
+                        k_tileCollisionBoxId,
+                        // Transform
+                        {tile.transform.position, transform.scale, transform.layer},
+                        // Rectangle
+                        {object.x, object.y, object.width, object.height});
                 }
             }
         }

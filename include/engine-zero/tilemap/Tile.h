@@ -5,7 +5,7 @@
 #include <variant>
 
 #include "engine-zero/graphics/Sprite.h"
-#include "engine-zero/physics/RigidBody.h"
+#include "engine-zero/physics/CollisionBox.h"
 
 namespace Engine {
 
@@ -23,7 +23,7 @@ struct Tile {
 
     bool isCollidable = false;
     Renderable* sprite = nullptr;
-    RigidBody* rigidBody = nullptr;
+    CollisionBox* rigidBody = nullptr;
     Transform transform;
 
     std::vector<Tile::Property> properties;

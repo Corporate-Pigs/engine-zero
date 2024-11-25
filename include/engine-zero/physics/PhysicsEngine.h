@@ -4,19 +4,20 @@
 #include <memory>
 #include <vector>
 
-#include "engine-zero/physics/Collision.h"
-#include "engine-zero/physics/RigidBody.h"
+#include "engine-zero/physics/MovingBody.h"
+#include "engine-zero/physics/CollisionBox.h"
 
 namespace Engine {
 
 class PhysicsEngine {
    public:
-    RigidBody* createRigidBody(Transform* transform, const Rectangle<float> collisionBox, bool isMovable = true);
+    MovingBody* createMovingBody(Transform& transform);
+    CollisionBox* createCollisionBox(const std::string& uid, const Transform& transform, const Rectangle<float> collisionBox);
     void update(const double elapsedTime);
 
    private:
-    void solveCollision(RigidBody* bodyA, RigidBody* bodyB) const;
-    std::vector<std::unique_ptr<RigidBody>> rigidBodies;
+    std::vector<std::unique_ptr<MovingBody>> movingBodies;
+    std::vector<std::unique_ptr<CollisionBox>> collisionBoxes;
 };
 
 }  // namespace Engine
