@@ -25,8 +25,10 @@ void Engine::PhysicsEngine::update(const double elapsedTime) {
 
         for (uint16_t indexA = 0; indexA < collisionBoxes.size(); indexA++) {
             auto boxA = collisionBoxes[indexA].get();
+            //boxA->update();
             for (uint16_t indexB = indexA + 1; indexB < collisionBoxes.size(); indexB++) {
                 auto boxB = collisionBoxes[indexB].get();
+                //boxB->update();
                 boxA->tryCollideWith(*boxB);
             }
         }

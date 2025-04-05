@@ -11,6 +11,7 @@ namespace Engine {
 struct CollisionBox {
    public:
     CollisionBox(const std::string& uid, const Transform& transform, const Rectangle<float>& rectangle);
+    void update();
     void updateCollisionRectangle(const Rectangle<float>& rectangle);
     void tryCollideWith(CollisionBox& other);
     bool isColliding();
@@ -20,6 +21,7 @@ struct CollisionBox {
     const std::string uid;
     const Transform& bindedTransform;
     Rectangle<float> rectangle;
+    cppvec::Vec2<float> originalPosition;
     std::set<std::string> collisions;
 };
 

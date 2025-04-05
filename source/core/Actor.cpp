@@ -8,7 +8,6 @@ Engine::Actor::Actor(uint32_t uid, const Transform& transform, const cppvec::Vec
 : uid(uid), transform(transform), mActive(true), anchorOffset(offset) {}
 
 void Engine::Actor::start(Context* context) {
-    if (!mActive) return;
     onStart(context);
     for(const auto childPtr : children) {
         childPtr->start(context);

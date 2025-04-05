@@ -4,10 +4,18 @@
 
 Engine::CollisionBox::CollisionBox(const std::string& uid, const Transform& transform,
                                    const Rectangle<float>& rectangle)
-    : uid(uid), bindedTransform(transform), rectangle(rectangle) {}
+    : uid(uid), bindedTransform(transform), rectangle(rectangle), originalPosition(rectangle.position) {
+        this->rectangle.position += transform.position;
+    }
+
+void Engine::CollisionBox::update() {
+    rectangle.position = originalPosition + bindedTransform.position; 
+    printf("%f\n", rectangle.position.y);
+}
 
 void Engine::CollisionBox::updateCollisionRectangle(const Rectangle<float>& rectangle) { 
-    this->rectangle = rectangle; 
+    this->rectangle = rectangle;
+    originalPosition = rectangle.position;
 };
 
 void Engine::CollisionBox::tryCollideWith(CollisionBox& other) {
